@@ -1,0 +1,149 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum ExperienceCategory {
+  RESTAURANT
+  HOTEL
+  RESORT
+  PARK
+  BAR
+  CAFE
+  ATTRACTION
+  OTHER
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  username     String   @unique
+  displayName  String
+  passwordHash String
+  avatarKey    String?
+  bio          String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  reviews            Review[]
+  comments           Comment[]
+  likes              Like[]
+  experiencesCreated Experience[]   @relation("ExperienceCreatedBy")
+  refreshTokens      RefreshToken[]
+
+  following Follow[] @relation("FollowerRelation")
+  followers Follow[] @relation("FollowingRelation")
+
+  @@index([username])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Experience {
+  id          String             @id @default(uuid())
+  name        String
+  category    ExperienceCategory
+  description String?
+  addressLine String?
+  city        String?
+  region      String?
+  country     String?
+  latitude    Float?
+  longitude   Float?
+  createdById String?
+  createdBy   User?              @relation("ExperienceCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  archivedAt  DateTime?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  reviews Review[]
+
+  @@index([category])
+  @@index([city, country])
+  @@index([latitude, longitude])
+  @@index([archivedAt])
+}
+
+model Review {
+  id           String     @id @default(uuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  experienceId String
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  rating       Int
+  text         String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  photos   Photo[]
+  likes    Like[]
+  comments Comment[]
+
+  @@index([experienceId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Photo {
+  id        String   @id @default(uuid())
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  objectKey String
+  position  Int
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+
+  @@unique([reviewId, position])
+  @@index([reviewId])
+}
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String
+  follower    User     @relation("FollowerRelation", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following   User     @relation("FollowingRelation", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@index([followingId])
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, reviewId])
+  @@index([reviewId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewId  String
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  text      String
+  createdAt DateTime @default(now())
+
+  @@index([reviewId])
+}

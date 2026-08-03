@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "ConnoSr",
+    "slug": "connosr",
+    "scheme": "connosr",
+    "version": "0.0.1",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "platforms": ["ios", "android"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "org.connosr.app"
+    },
+    "android": {
+      "package": "org.connosr.app"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

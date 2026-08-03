@@ -1,0 +1,26 @@
+node_modules/
+dist/
+build/
+.turbo/
+.env
+.env.local
+*.log
+.DS_Store
+coverage/
+
+# Expo / React Native
+.expo/
+.expo-shared/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Prisma
+apps/api/prisma/dev.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
