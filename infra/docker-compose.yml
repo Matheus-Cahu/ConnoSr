@@ -1,0 +1,52 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: connosr
+      POSTGRES_PASSWORD: connosr
+      POSTGRES_DB: connosr
+    ports:
+      - "5432:5432"
+    volumes:
+      - connosr_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U connosr"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: connosr
+      MINIO_ROOT_PASSWORD: connosr-secret
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - connosr_minio_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  minio-createbuckets:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 connosr connosr-secret;
+      mc mb -p local/connosr-photos;
+      mc anonymous set download local/connosr-photos;
+      exit 0;
+      "
+
+volumes:
+  connosr_postgres_data:
+  connosr_minio_data:
