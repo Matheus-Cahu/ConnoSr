@@ -50,7 +50,9 @@ export function createApiClient(config: ApiClientConfig): ApiClient {
     const { skipAuthRetry, ...requestInit } = init;
     const accessToken = await tokenStorage.getAccessToken();
     const headers = new Headers(requestInit.headers);
-    headers.set("Content-Type", headers.get("Content-Type") ?? "application/json");
+    if (requestInit.body !== undefined) {
+      headers.set("Content-Type", headers.get("Content-Type") ?? "application/json");
+    }
     if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
 
     const res = await fetch(`${baseUrl}${path}`, {

@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
-import { updateUserSchema } from "@connosr/shared-types";
+import { cursorPageQuerySchema, updateUserSchema } from "@connosr/shared-types";
+import { listReviewsByUser } from "../reviews/service.js";
 import {
   followUser,
   getUser,
@@ -27,6 +28,11 @@ export default async function userRoutes(fastify: FastifyInstance) {
 
   fastify.get<{ Params: { id: string } }>("/:id/following", async (request, reply) => {
     return reply.send(await listFollowing(request.params.id));
+  });
+
+  fastify.get<{ Params: { id: string } }>("/:id/reviews", async (request, reply) => {
+    const query = cursorPageQuerySchema.parse(request.query);
+    return reply.send(await listReviewsByUser(request.params.id, query));
   });
 
   fastify.post<{ Params: { id: string } }>(
