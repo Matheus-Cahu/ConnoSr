@@ -45,10 +45,12 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="activity"
+        name="create"
         options={{
-          title: "Atividade dos amigos",
-          tabBarIcon: ({ color, size }) => <Feather name="users" color={color} size={size} />,
+          title: "Criar post",
+          tabBarIcon: ({ color, size }) => <Feather name="plus" color={color} size={size} />,
+          headerStyle: { backgroundColor: "#050506" },
+          headerTintColor: "#f5f5f0",
         }}
       />
       <Tabs.Screen

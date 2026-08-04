@@ -1,4 +1,5 @@
 import { useFeed } from "@connosr/api-client";
+import { DarkSection } from "../components/DarkSection.js";
 import { ReviewCard } from "../components/ReviewCard.js";
 
 export function HomePage() {
@@ -6,7 +7,7 @@ export function HomePage() {
   const reviews = feed.data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
-    <div style={styles.section}>
+    <DarkSection>
       {feed.isLoading && <p style={styles.muted}>Carregando feed...</p>}
 
       {!feed.isLoading && reviews.length === 0 && (
@@ -24,17 +25,11 @@ export function HomePage() {
           {feed.isFetchingNextPage ? "Carregando..." : "Carregar mais"}
         </button>
       )}
-    </div>
+    </DarkSection>
   );
 }
 
 const styles = {
-  section: {
-    margin: "-16px -16px 0",
-    padding: "24px 16px 32px",
-    background: "linear-gradient(180deg, #050506 0%, #0a1f14 100%)",
-    minHeight: "calc(100vh - 72px)",
-  },
   muted: { color: "#9a9aa2" },
   loadMore: {
     display: "block",
