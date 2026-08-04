@@ -30,10 +30,14 @@ export default async function userRoutes(fastify: FastifyInstance) {
     return reply.send(await listFollowing(request.params.id));
   });
 
-  fastify.get<{ Params: { id: string } }>("/:id/reviews", async (request, reply) => {
-    const query = cursorPageQuerySchema.parse(request.query);
-    return reply.send(await listReviewsByUser(request.params.id, query));
-  });
+  fastify.get<{ Params: { id: string } }>(
+    "/:id/reviews",
+    { preHandler: fastify.optionalAuthenticate },
+    async (request, reply) => {
+      const query = cursorPageQuerySchema.parse(request.query);
+      return reply.send(await listReviewsByUser(request.params.id, query, request.optionalUserId));
+    },
+  );
 
   fastify.post<{ Params: { id: string } }>(
     "/:id/follow",
