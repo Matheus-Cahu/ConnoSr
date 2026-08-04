@@ -3,6 +3,7 @@ import type {
   Comment,
   CreateCommentInput,
   CreateReviewInput,
+  CursorPageQuery,
   Review,
   ReviewWithRelations,
   UpdateReviewInput,
@@ -91,6 +92,29 @@ export async function getReview(
       createdAt: review.experience.createdAt.toISOString(),
     },
   };
+}
+
+export async function listReviewsByUser(
+  targetUserId: string,
+  query: CursorPageQuery,
+  currentUserId?: string,
+): Promise<{ items: ReviewWithRelations[]; nextCursor: string | null }> {
+  const reviews = await prisma.review.findMany({
+    where: { userId: targetUserId },
+    orderBy: { createdAt: "desc" },
+    take: query.limit + 1,
+    ...(query.cursor ? { cursor: { id: query.cursor }, skip: 1 } : {}),
+  });
+
+  const hasMore = reviews.length > query.limit;
+  const page = hasMore ? reviews.slice(0, query.limit) : reviews;
+  const nextCursor = hasMore ? (page[page.length - 1]?.id ?? null) : null;
+
+  const items = (
+    await Promise.all(page.map((review) => getReview(review.id, currentUserId)))
+  ).filter((review): review is ReviewWithRelations => review !== null);
+
+  return { items, nextCursor };
 }
 
 export async function updateReview(

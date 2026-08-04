@@ -1,6 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { FollowListItem, UpdateUserInput, User } from "@connosr/shared-types";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { FollowListItem, ReviewWithRelations, UpdateUserInput, User } from "@connosr/shared-types";
 import { useApiClient } from "../context.js";
+
+interface UserReviewsPage {
+  items: ReviewWithRelations[];
+  nextCursor: string | null;
+}
 
 export function useUser(id: string) {
   const client = useApiClient();
@@ -40,6 +45,21 @@ export function useFollowing(userId: string) {
   return useQuery({
     queryKey: ["users", userId, "following"],
     queryFn: () => client.request<FollowListItem[]>(`/api/v1/users/${userId}/following`),
+    enabled: Boolean(userId),
+  });
+}
+
+export function useUserReviews(userId: string) {
+  const client = useApiClient();
+  return useInfiniteQuery({
+    queryKey: ["users", userId, "reviews"],
+    queryFn: ({ pageParam }: { pageParam: string | null }) => {
+      const params = new URLSearchParams({ limit: "20" });
+      if (pageParam) params.set("cursor", pageParam);
+      return client.request<UserReviewsPage>(`/api/v1/users/${userId}/reviews?${params.toString()}`);
+    },
+    initialPageParam: null as string | null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: Boolean(userId),
   });
 }
