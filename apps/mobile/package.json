@@ -15,6 +15,7 @@
   "dependencies": {
     "@babel/runtime": "^7.26.0",
     "@connosr/api-client": "workspace:*",
+    "@expo/vector-icons": "^14.0.4",
     "@connosr/shared-types": "workspace:*",
     "@connosr/ui": "workspace:*",
     "@tanstack/react-query": "^5.64.1",

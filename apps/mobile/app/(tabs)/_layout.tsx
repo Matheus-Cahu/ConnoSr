@@ -1,5 +1,6 @@
 import { Redirect, Tabs } from "expo-router";
 import { ActivityIndicator, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { useMe } from "@connosr/api-client";
 
 export default function TabsLayout() {
@@ -18,11 +19,43 @@ export default function TabsLayout() {
   }
 
   return (
-    <Tabs screenOptions={{ headerTitle: "ConnoSr" }}>
-      <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="activity" options={{ title: "Atividade" }} />
-      <Tabs.Screen name="journal" options={{ title: "Journal" }} />
-      <Tabs.Screen name="profile" options={{ title: "Perfil" }} />
+    <Tabs
+      screenOptions={{
+        headerTitle: "ConnoSr",
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: "#e8503a",
+        tabBarInactiveTintColor: "#7a7a82",
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{ title: "Home", tabBarIcon: ({ color, size }) => <Feather name="home" color={color} size={size} /> }}
+      />
+      <Tabs.Screen
+        name="journal"
+        options={{
+          title: "Journal",
+          tabBarIcon: ({ color, size }) => <Feather name="file-text" color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="activity"
+        options={{
+          title: "Atividade dos amigos",
+          tabBarIcon: ({ color, size }) => <Feather name="users" color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="my-activity"
+        options={{
+          title: "Minha atividade",
+          tabBarIcon: ({ color, size }) => <Feather name="activity" color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{ title: "Perfil", tabBarIcon: ({ color, size }) => <Feather name="user" color={color} size={size} /> }}
+      />
     </Tabs>
   );
 }

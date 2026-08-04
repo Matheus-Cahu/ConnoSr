@@ -1,6 +1,6 @@
 import { useOutletContext } from "react-router-dom";
 import type { User } from "@connosr/shared-types";
-import { useFollowers, useFollowing, useUserReviews } from "@connosr/api-client";
+import { useFollowers, useFollowing, useLogout, useUserReviews } from "@connosr/api-client";
 import { JournalEntryRow } from "../components/JournalEntryRow.js";
 
 export function ProfilePage() {
@@ -9,6 +9,7 @@ export function ProfilePage() {
   const following = useFollowing(me.id);
   const reviews = useUserReviews(me.id);
   const reviewItems = reviews.data?.pages.flatMap((page) => page.items) ?? [];
+  const logout = useLogout();
 
   return (
     <div>
@@ -27,6 +28,9 @@ export function ProfilePage() {
             <strong>{following.data?.length ?? 0}</strong> seguindo
           </span>
         </div>
+        <button onClick={() => logout.mutate()} style={{ alignSelf: "flex-start", marginTop: 4 }}>
+          Sair
+        </button>
       </header>
 
       <h2 style={{ fontSize: 16 }}>Minhas reviews</h2>

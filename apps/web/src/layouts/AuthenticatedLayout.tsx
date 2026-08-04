@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useMe } from "@connosr/api-client";
-import { NavBar } from "../components/NavBar.js";
+import { TabBar } from "../components/TabBar.js";
 
 export function AuthenticatedLayout() {
   const me = useMe();
@@ -9,9 +9,16 @@ export function AuthenticatedLayout() {
   if (me.isError || !me.data) return <Navigate to="/login" replace />;
 
   return (
-    <main style={{ maxWidth: 640, margin: "0 auto", padding: "0 16px", fontFamily: "system-ui, sans-serif" }}>
-      <NavBar />
+    <main
+      style={{
+        maxWidth: 640,
+        margin: "0 auto",
+        padding: "16px 16px 72px",
+        fontFamily: "system-ui, sans-serif",
+      }}
+    >
       <Outlet context={{ me: me.data }} />
+      <TabBar />
     </main>
   );
 }
