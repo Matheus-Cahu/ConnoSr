@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { ApiClientProvider, createQueryClient } from "@connosr/api-client";
 import { apiClient, tokenStorage } from "./apiClient.js";
 import { App } from "./App.js";
+import "./index.css";
 
 const queryClient = createQueryClient();
 
