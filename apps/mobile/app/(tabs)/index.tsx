@@ -8,14 +8,15 @@ export default function HomeScreen() {
 
   if (feed.isLoading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator />
+      <View style={[styles.center, styles.background]}>
+        <ActivityIndicator color="#fff" />
       </View>
     );
   }
 
   return (
     <FlatList
+      style={styles.background}
       contentContainerStyle={styles.list}
       data={reviews}
       keyExtractor={(review) => review.id}
@@ -32,7 +33,8 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  background: { flex: 1, backgroundColor: "#050506" },
+  center: { justifyContent: "center", alignItems: "center" },
   list: { padding: 16 },
-  empty: { color: "gray", padding: 16 },
+  empty: { color: "#9a9aa2", padding: 16 },
 });

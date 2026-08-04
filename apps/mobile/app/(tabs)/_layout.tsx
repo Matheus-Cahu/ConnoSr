@@ -25,11 +25,17 @@ export default function TabsLayout() {
         tabBarShowLabel: false,
         tabBarActiveTintColor: "#e8503a",
         tabBarInactiveTintColor: "#7a7a82",
+        tabBarStyle: { backgroundColor: "#0f0f12", borderTopColor: "#2a2a30" },
       }}
     >
       <Tabs.Screen
         name="index"
-        options={{ title: "Home", tabBarIcon: ({ color, size }) => <Feather name="home" color={color} size={size} /> }}
+        options={{
+          title: "Home",
+          tabBarIcon: ({ color, size }) => <Feather name="home" color={color} size={size} />,
+          headerStyle: { backgroundColor: "#050506" },
+          headerTintColor: "#f5f5f0",
+        }}
       />
       <Tabs.Screen
         name="journal"
