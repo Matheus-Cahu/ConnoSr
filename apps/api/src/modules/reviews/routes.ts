@@ -24,11 +24,15 @@ export default async function reviewRoutes(fastify: FastifyInstance) {
     return reply.code(201).send(review);
   });
 
-  fastify.get<{ Params: { id: string } }>("/:id", async (request, reply) => {
-    const review = await getReview(request.params.id);
-    if (!review) return reply.code(404).send({ message: "Review not found" });
-    return reply.send(review);
-  });
+  fastify.get<{ Params: { id: string } }>(
+    "/:id",
+    { preHandler: fastify.optionalAuthenticate },
+    async (request, reply) => {
+      const review = await getReview(request.params.id, request.optionalUserId);
+      if (!review) return reply.code(404).send({ message: "Review not found" });
+      return reply.send(review);
+    },
+  );
 
   fastify.patch<{ Params: { id: string } }>(
     "/:id",

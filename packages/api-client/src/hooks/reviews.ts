@@ -60,6 +60,7 @@ export function useLikeReview(reviewId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reviews", reviewId] });
       queryClient.invalidateQueries({ queryKey: ["feed"] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 }

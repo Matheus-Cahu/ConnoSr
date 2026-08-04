@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLikeReview } from "@connosr/api-client";
@@ -8,28 +9,36 @@ import { PhotoCarousel } from "./PhotoCarousel";
 import { CarouselDots } from "./CarouselDots";
 import { StarRating } from "./StarRating";
 
-export function ReviewCard({ review }: { review: ReviewWithRelations }) {
+export function ReviewCard({
+  review,
+  showUser = true,
+}: {
+  review: ReviewWithRelations;
+  showUser?: boolean;
+}) {
   const like = useLikeReview(review.id);
   const liked = review.likedByCurrentUser ?? false;
   const [photoIndex, setPhotoIndex] = useState(0);
 
   return (
     <View style={styles.article}>
-      <View style={styles.userRow}>
-        <View style={styles.avatar}>
-          {review.user.avatarUrl ? (
-            <Image source={{ uri: review.user.avatarUrl }} style={styles.avatarImg} />
-          ) : (
-            <Feather name="user" size={20} color="#7a7a82" />
-          )}
+      {showUser && (
+        <View style={styles.userRow}>
+          <View style={styles.avatar}>
+            {review.user.avatarUrl ? (
+              <Image source={{ uri: review.user.avatarUrl }} style={styles.avatarImg} />
+            ) : (
+              <Feather name="user" size={20} color="#7a7a82" />
+            )}
+          </View>
+          <View>
+            <Text style={styles.displayName}>{review.user.displayName}</Text>
+            <Text style={styles.username}>@{review.user.username}</Text>
+          </View>
         </View>
-        <View>
-          <Text style={styles.displayName}>{review.user.displayName}</Text>
-          <Text style={styles.username}>@{review.user.username}</Text>
-        </View>
-      </View>
+      )}
 
-      <View style={styles.card}>
+      <Pressable style={styles.card} onPress={() => router.push(`/review/${review.id}`)}>
         <PhotoCarousel photos={review.photos} onIndexChange={setPhotoIndex} />
 
         <View style={styles.ratingBadge}>
@@ -51,7 +60,7 @@ export function ReviewCard({ review }: { review: ReviewWithRelations }) {
             </Text>
           ) : null}
         </LinearGradient>
-      </View>
+      </Pressable>
 
       {review.photos.length > 1 && <CarouselDots count={review.photos.length} activeIndex={photoIndex} />}
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MapPin, User as UserIcon } from "lucide-react";
 import { useLikeReview } from "@connosr/api-client";
 import type { ReviewWithRelations } from "@connosr/shared-types";
@@ -6,28 +7,43 @@ import { PhotoCarousel } from "./PhotoCarousel.js";
 import { CarouselDots } from "./CarouselDots.js";
 import { StarRating } from "./StarRating.js";
 
-export function ReviewCard({ review }: { review: ReviewWithRelations }) {
+export function ReviewCard({
+  review,
+  showUser = true,
+}: {
+  review: ReviewWithRelations;
+  showUser?: boolean;
+}) {
+  const navigate = useNavigate();
   const like = useLikeReview(review.id);
   const liked = review.likedByCurrentUser ?? false;
   const [photoIndex, setPhotoIndex] = useState(0);
 
   return (
     <article style={styles.article}>
-      <header style={styles.userRow}>
-        <div style={styles.avatar}>
-          {review.user.avatarUrl ? (
-            <img src={review.user.avatarUrl} alt="" style={styles.avatarImg} />
-          ) : (
-            <UserIcon size={20} color="#7a7a82" />
-          )}
-        </div>
-        <div>
-          <div style={styles.displayName}>{review.user.displayName}</div>
-          <div style={styles.username}>@{review.user.username}</div>
-        </div>
-      </header>
+      {showUser && (
+        <header style={styles.userRow}>
+          <div style={styles.avatar}>
+            {review.user.avatarUrl ? (
+              <img src={review.user.avatarUrl} alt="" style={styles.avatarImg} />
+            ) : (
+              <UserIcon size={20} color="#7a7a82" />
+            )}
+          </div>
+          <div>
+            <div style={styles.displayName}>{review.user.displayName}</div>
+            <div style={styles.username}>@{review.user.username}</div>
+          </div>
+        </header>
+      )}
 
-      <div style={styles.card}>
+      <div
+        style={styles.card}
+        role="button"
+        tabIndex={0}
+        onClick={() => navigate(`/reviews/${review.id}`)}
+        onKeyDown={(e) => e.key === "Enter" && navigate(`/reviews/${review.id}`)}
+      >
         <PhotoCarousel photos={review.photos} onIndexChange={setPhotoIndex} />
 
         <div style={styles.ratingBadge}>
@@ -46,7 +62,14 @@ export function ReviewCard({ review }: { review: ReviewWithRelations }) {
       {review.photos.length > 1 && <CarouselDots count={review.photos.length} activeIndex={photoIndex} />}
 
       <div style={styles.actions}>
-        <button onClick={() => like.mutate(!liked)} disabled={like.isPending} style={styles.likeButton}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            like.mutate(!liked);
+          }}
+          disabled={like.isPending}
+          style={styles.likeButton}
+        >
           <span style={{ color: liked ? "#e8503a" : "#7a7a82" }}>
             {liked ? "♥" : "♡"} {review.likeCount}
           </span>
@@ -80,6 +103,7 @@ const styles = {
     aspectRatio: "4 / 5",
     borderRadius: 20,
     overflow: "hidden",
+    cursor: "pointer",
   },
   ratingBadge: { position: "absolute", top: 12, right: 14 },
   overlay: {

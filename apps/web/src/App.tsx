@@ -6,6 +6,7 @@ import { CreatePostPage } from "./pages/CreatePostPage.js";
 import { MyActivityPage } from "./pages/MyActivityPage.js";
 import { JournalPage } from "./pages/JournalPage.js";
 import { ProfilePage } from "./pages/ProfilePage.js";
+import { ReviewDetailPage } from "./pages/ReviewDetailPage.js";
 
 export function App() {
   return (
@@ -18,6 +19,7 @@ export function App() {
           <Route path="/create" element={<CreatePostPage />} />
           <Route path="/my-activity" element={<MyActivityPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/reviews/:id" element={<ReviewDetailPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
