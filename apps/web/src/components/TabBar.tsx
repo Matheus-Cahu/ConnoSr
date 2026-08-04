@@ -1,10 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { Activity, FileText, Home, User, Users } from "lucide-react";
+import { Activity, FileText, Home, Plus, User } from "lucide-react";
 
 const TABS = [
   { to: "/", icon: Home, end: true, label: "Home" },
   { to: "/journal", icon: FileText, label: "Journal" },
-  { to: "/activity", icon: Users, label: "Atividade dos amigos" },
+  { to: "/create", icon: Plus, label: "Criar post" },
   { to: "/my-activity", icon: Activity, label: "Minha atividade" },
   { to: "/profile", icon: User, label: "Perfil" },
 ];

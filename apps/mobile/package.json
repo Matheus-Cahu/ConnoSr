@@ -20,6 +20,7 @@
     "@connosr/ui": "workspace:*",
     "@tanstack/react-query": "^5.64.1",
     "expo": "~52.0.23",
+    "expo-image-picker": "~16.0.6",
     "expo-linear-gradient": "~14.0.1",
     "expo-router": "~4.0.15",
     "expo-secure-store": "~14.0.0",
