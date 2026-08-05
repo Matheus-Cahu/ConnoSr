@@ -89,9 +89,13 @@ model Review {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  photos   Photo[]
-  likes    Like[]
-  comments Comment[]
+  photos    Photo[]
+  likes     Like[]
+  comments  Comment[]
+
+  /// Feature-hashed embedding (user + experience + experience city + rating),
+  /// L2-normalized. Used for cosine-similarity "similar posts" lookups.
+  embedding Float[] @default([])
 
   @@index([experienceId])
   @@index([userId])

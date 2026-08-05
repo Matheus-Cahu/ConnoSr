@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import type { ReviewWithRelations } from "@connosr/shared-types";
 import { useApiClient } from "../context.js";
 
-interface FeedPage {
+export interface FeedPage {
   items: ReviewWithRelations[];
   nextCursor: string | null;
 }
