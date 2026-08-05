@@ -50,6 +50,36 @@ pnpm dev
 Usuários de exemplo (seed): `alice@example.com` / `bruno@example.com`, senha
 `password123`.
 
+## Acessando pelo celular (mesma rede Wi-Fi)
+
+O app web e o backend, por padrão, só ficam acessíveis no próprio computador
+(`localhost`). Pra abrir no navegador do celular, ele precisa estar na
+**mesma rede Wi-Fi** do computador e você precisa usar o **IP local do
+computador**, não `localhost`:
+
+1. Descubra o IP local do computador (ex: `192.168.1.42`):
+   - macOS/Linux: `ipconfig getifaddr en0` (Wi-Fi) ou `hostname -I`
+   - Windows: `ipconfig` (campo "Endereço IPv4")
+2. Aponte o app web pra API usando esse IP em vez de `localhost`:
+   ```bash
+   echo "VITE_API_URL=http://SEU_IP_LOCAL:3001" > apps/web/.env
+   ```
+3. Permita esse IP no CORS do backend (`apps/api/.env`):
+   ```
+   WEB_ORIGIN=http://SEU_IP_LOCAL:5173
+   ```
+4. Suba os dois normalmente (`pnpm dev`) e, **no celular**, acesse:
+   `http://SEU_IP_LOCAL:5173`
+
+⚠️ Se ao acessar pelo celular aparecer um **JSON grande** em vez do app,
+você provavelmente abriu a porta da **API (3001)** em vez da porta do
+**app web (5173)** — confira a URL. Um firewall bloqueando a conexão
+também é uma causa comum de não conseguir acessar de jeito nenhum.
+
+Pra rodar o **app mobile** (não o web) no celular de verdade, use o Expo Go:
+`pnpm --filter @connosr/mobile start` e escaneie o QR code — celular e
+computador também precisam estar na mesma rede.
+
 ## Scripts úteis
 
 - `pnpm lint` / `pnpm typecheck` / `pnpm build` / `pnpm test` — rodam em todos os apps/packages via Turborepo.
