@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { type InfiniteData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   AttachPhotoInput,
   Comment,
@@ -6,8 +6,10 @@ import type {
   CreateReviewInput,
   Review,
   ReviewWithRelations,
+  SimilarReviewsResponse,
 } from "@connosr/shared-types";
 import { useApiClient } from "../context.js";
+import type { FeedPage } from "./feed.js";
 
 export function useReview(id: string) {
   const client = useApiClient();
@@ -15,6 +17,16 @@ export function useReview(id: string) {
     queryKey: ["reviews", id],
     queryFn: () => client.request<ReviewWithRelations>(`/api/v1/reviews/${id}`),
     enabled: Boolean(id),
+  });
+}
+
+export function useSimilarReviews(reviewId: string, limit = 10) {
+  const client = useApiClient();
+  return useQuery({
+    queryKey: ["reviews", reviewId, "similar", limit],
+    queryFn: () =>
+      client.request<SimilarReviewsResponse>(`/api/v1/reviews/${reviewId}/similar?limit=${limit}`),
+    enabled: Boolean(reviewId),
   });
 }
 
@@ -49,6 +61,15 @@ export function useAttachPhoto(reviewId: string) {
   });
 }
 
+/**
+ * Liking a review also pulls in reviews vectorially similar to it (same
+ * experience/user/city, close rating) and splices them into the top of the
+ * cached home feed, so the feed visibly reacts to what you just liked.
+ *
+ * The feed cache is patched directly (like state, then similar items)
+ * rather than invalidated: invalidating would kick off a background refetch
+ * that could resolve after the splice below and silently wipe it out.
+ */
 export function useLikeReview(reviewId: string) {
   const client = useApiClient();
   const queryClient = useQueryClient();
@@ -57,10 +78,51 @@ export function useLikeReview(reviewId: string) {
       client.request(`/api/v1/reviews/${reviewId}/like`, {
         method: like ? "POST" : "DELETE",
       }),
-    onSuccess: () => {
+    onSuccess: async (_data, like) => {
       queryClient.invalidateQueries({ queryKey: ["reviews", reviewId] });
-      queryClient.invalidateQueries({ queryKey: ["feed"] });
       queryClient.invalidateQueries({ queryKey: ["users"] });
+
+      queryClient.setQueryData<InfiniteData<FeedPage>>(["feed"], (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          pages: old.pages.map((page) => ({
+            ...page,
+            items: page.items.map((item) =>
+              item.id === reviewId
+                ? { ...item, likedByCurrentUser: like, likeCount: item.likeCount + (like ? 1 : -1) }
+                : item,
+            ),
+          })),
+        };
+      });
+
+      if (!like) return;
+      try {
+        const similar = await client.request<SimilarReviewsResponse>(
+          `/api/v1/reviews/${reviewId}/similar?limit=5`,
+        );
+        if (similar.items.length === 0) return;
+
+        queryClient.setQueryData<InfiniteData<FeedPage>>(["feed"], (old) => {
+          if (!old || old.pages.length === 0) return old;
+          const existingIds = new Set(old.pages.flatMap((page) => page.items.map((item) => item.id)));
+          const newItems = similar.items.filter(
+            (item) => item.id !== reviewId && !existingIds.has(item.id),
+          );
+          if (newItems.length === 0) return old;
+
+          const [firstPage, ...restPages] = old.pages;
+          if (!firstPage) return old;
+          return {
+            ...old,
+            pages: [{ ...firstPage, items: [...newItems, ...firstPage.items] }, ...restPages],
+          };
+        });
+      } catch {
+        // best-effort: composing the feed from similar posts is a nice-to-have,
+        // never worth failing the like action over.
+      }
     },
   });
 }

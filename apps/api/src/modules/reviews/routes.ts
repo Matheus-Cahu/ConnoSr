@@ -3,6 +3,7 @@ import {
   attachPhotoInputSchema,
   createCommentInputSchema,
   createReviewInputSchema,
+  similarReviewsQuerySchema,
   updateReviewInputSchema,
 } from "@connosr/shared-types";
 import {
@@ -13,6 +14,7 @@ import {
   getReview,
   likeReview,
   listComments,
+  listSimilarReviews,
   unlikeReview,
   updateReview,
 } from "./service.js";
@@ -80,6 +82,16 @@ export default async function reviewRoutes(fastify: FastifyInstance) {
     async (request, reply) => {
       await unlikeReview(request.userId, request.params.id);
       return reply.code(204).send();
+    },
+  );
+
+  fastify.get<{ Params: { id: string } }>(
+    "/:id/similar",
+    { preHandler: fastify.optionalAuthenticate },
+    async (request, reply) => {
+      const query = similarReviewsQuerySchema.parse(request.query);
+      const items = await listSimilarReviews(request.params.id, query.limit, request.optionalUserId);
+      return reply.send({ items });
     },
   );
 

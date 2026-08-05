@@ -36,6 +36,16 @@ export const updateReviewInputSchema = z.object({
 });
 export type UpdateReviewInput = z.infer<typeof updateReviewInputSchema>;
 
+export const similarReviewsQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(20).default(10),
+});
+export type SimilarReviewsQuery = z.infer<typeof similarReviewsQuerySchema>;
+
+export const similarReviewsResponseSchema = z.object({
+  items: z.array(reviewWithRelationsSchema),
+});
+export type SimilarReviewsResponse = z.infer<typeof similarReviewsResponseSchema>;
+
 export const commentSchema = z.object({
   id: z.string().uuid(),
   reviewId: z.string().uuid(),
