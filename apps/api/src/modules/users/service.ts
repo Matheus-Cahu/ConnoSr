@@ -12,6 +12,26 @@ export async function updateMe(userId: string, input: UpdateUserInput): Promise<
   return toPublicUser(user);
 }
 
+export async function searchUsers(
+  query: string,
+  limit: number,
+  currentUserId?: string,
+): Promise<FollowListItem[]> {
+  if (!query.trim()) return [];
+  const users = await prisma.user.findMany({
+    where: {
+      ...(currentUserId ? { id: { not: currentUserId } } : {}),
+      OR: [
+        { username: { contains: query, mode: "insensitive" } },
+        { displayName: { contains: query, mode: "insensitive" } },
+      ],
+    },
+    orderBy: { username: "asc" },
+    take: limit,
+  });
+  return annotateFollowedByCurrentUser(users, currentUserId);
+}
+
 export async function followUser(followerId: string, followingId: string): Promise<void> {
   if (followerId === followingId) return;
   await prisma.follow.upsert({

@@ -15,3 +15,9 @@ export const updateUserSchema = z.object({
   bio: z.string().max(280).nullable().optional(),
 });
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+
+export const searchUsersQuerySchema = z.object({
+  q: z.string().max(160).optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+export type SearchUsersQuery = z.infer<typeof searchUsersQuerySchema>;

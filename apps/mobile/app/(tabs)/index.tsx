@@ -1,18 +1,11 @@
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, StyleSheet, Text } from "react-native";
 import { useFeed } from "@connosr/api-client";
 import { ReviewCard } from "../../src/components/ReviewCard";
+import { SearchBar } from "../../src/components/SearchBar";
 
 export default function HomeScreen() {
   const feed = useFeed();
   const reviews = feed.data?.pages.flatMap((page) => page.items) ?? [];
-
-  if (feed.isLoading) {
-    return (
-      <View style={[styles.center, styles.background]}>
-        <ActivityIndicator color="#fff" />
-      </View>
-    );
-  }
 
   return (
     <FlatList
@@ -23,10 +16,15 @@ export default function HomeScreen() {
       renderItem={({ item }) => <ReviewCard review={item} />}
       onEndReached={() => feed.hasNextPage && feed.fetchNextPage()}
       onEndReachedThreshold={0.5}
+      ListHeaderComponent={<SearchBar />}
       ListEmptyComponent={
-        <Text style={styles.empty}>
-          Nenhuma review por aqui ainda. Siga outras pessoas para ver as reviews delas no seu feed.
-        </Text>
+        feed.isLoading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.empty}>
+            Nenhuma review por aqui ainda. Siga outras pessoas para ver as reviews delas no seu feed.
+          </Text>
+        )
       }
     />
   );
@@ -34,7 +32,6 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   background: { flex: 1, backgroundColor: "#050506" },
-  center: { justifyContent: "center", alignItems: "center" },
   list: { padding: 16 },
   empty: { color: "#9a9aa2", padding: 16 },
 });

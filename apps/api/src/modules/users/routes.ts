@@ -1,16 +1,22 @@
 import type { FastifyInstance } from "fastify";
-import { cursorPageQuerySchema, updateUserSchema } from "@connosr/shared-types";
+import { cursorPageQuerySchema, searchUsersQuerySchema, updateUserSchema } from "@connosr/shared-types";
 import { listReviewsByUser } from "../reviews/service.js";
 import {
   followUser,
   getUser,
   listFollowers,
   listFollowing,
+  searchUsers,
   unfollowUser,
   updateMe,
 } from "./service.js";
 
 export default async function userRoutes(fastify: FastifyInstance) {
+  fastify.get("/", { preHandler: fastify.optionalAuthenticate }, async (request, reply) => {
+    const query = searchUsersQuerySchema.parse(request.query);
+    return reply.send(await searchUsers(query.q ?? "", query.limit, request.optionalUserId));
+  });
+
   fastify.patch("/me", { preHandler: fastify.authenticate }, async (request, reply) => {
     const input = updateUserSchema.parse(request.body);
     return reply.send(await updateMe(request.userId, input));

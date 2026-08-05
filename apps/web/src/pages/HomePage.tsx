@@ -1,6 +1,7 @@
 import { useFeed } from "@connosr/api-client";
 import { DarkSection } from "../components/DarkSection.js";
 import { ReviewCard } from "../components/ReviewCard.js";
+import { SearchBar } from "../components/SearchBar.js";
 
 export function HomePage() {
   const feed = useFeed();
@@ -8,6 +9,8 @@ export function HomePage() {
 
   return (
     <DarkSection>
+      <SearchBar />
+
       {feed.isLoading && <p style={styles.muted}>Carregando feed...</p>}
 
       {!feed.isLoading && reviews.length === 0 && (

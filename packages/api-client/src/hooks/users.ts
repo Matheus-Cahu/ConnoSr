@@ -73,8 +73,23 @@ export function useFollowUser(userId: string) {
         method: follow ? "POST" : "DELETE",
       }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["users", userId] });
+      // Broad invalidation (not just ["users", userId]) so lists that embed this
+      // user's followedByCurrentUser flag elsewhere — search results, followers/
+      // following lists — pick up the change too.
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["feed"] });
     },
+  });
+}
+
+export function useSearchUsers(query: string, limit = 20) {
+  const client = useApiClient();
+  return useQuery({
+    queryKey: ["users", "search", query, limit],
+    queryFn: () =>
+      client.request<FollowListItem[]>(
+        `/api/v1/users?q=${encodeURIComponent(query)}&limit=${limit}`,
+      ),
+    enabled: query.trim().length > 0,
   });
 }
