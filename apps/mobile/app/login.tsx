@@ -1,55 +1,58 @@
 import { useState } from "react";
-import { router } from "expo-router";
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
-import { useHealthCheck, useLogin } from "@connosr/api-client";
+import { Link, router, Stack } from "expo-router";
+import { Pressable, Text, TextInput } from "react-native";
+import { useLogin } from "@connosr/api-client";
+import { colors } from "@connosr/ui";
+import { AuthScreen, authErrorStyle, authInputStyle, authSubmitStyle } from "../src/components/AuthScreen";
 
 export default function LoginScreen() {
-  const health = useHealthCheck();
   const login = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   function handleSubmit() {
-    login.mutate(
-      { email, password },
-      { onSuccess: () => router.replace("/") },
-    );
+    login.mutate({ email, password }, { onSuccess: () => router.replace("/") });
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>ConnoSr</Text>
-      <Text style={{ color: health.isSuccess ? "green" : health.isError ? "crimson" : "gray" }}>
-        API: {health.isLoading ? "verificando..." : health.isSuccess ? "online" : "offline"}
-      </Text>
+    <AuthScreen
+      title="Bem-vindo de volta"
+      subtitle="Entre para ver as experiências de quem você segue."
+      footer={
+        <Text style={{ color: colors.textMuted }}>
+          Ainda não tem conta?{" "}
+          <Link href="/signup" style={{ color: colors.primary }}>
+            Cadastre-se
+          </Link>
+        </Text>
+      }
+    >
+      <Stack.Screen options={{ headerShown: false }} />
       <TextInput
-        style={styles.input}
-        placeholder="email"
+        placeholder="Email"
+        placeholderTextColor={colors.textMuted}
         autoCapitalize="none"
+        autoComplete="email"
         keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
+        style={authInputStyle}
       />
       <TextInput
-        style={styles.input}
-        placeholder="senha"
+        placeholder="Senha"
+        placeholderTextColor={colors.textMuted}
+        autoComplete="current-password"
         secureTextEntry
         value={password}
         onChangeText={setPassword}
+        style={authInputStyle}
       />
-      <Button title={login.isPending ? "Entrando..." : "Entrar"} onPress={handleSubmit} disabled={login.isPending} />
-      {login.isError && <Text style={{ color: "crimson" }}>Email ou senha inválidos.</Text>}
-    </View>
+      {login.isError ? <Text style={authErrorStyle}>Email ou senha inválidos.</Text> : null}
+      <Pressable onPress={handleSubmit} disabled={login.isPending} style={authSubmitStyle}>
+        <Text style={{ color: "#fff", fontWeight: "700", fontSize: 15 }}>
+          {login.isPending ? "Entrando..." : "Entrar"}
+        </Text>
+      </Pressable>
+    </AuthScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 24, gap: 12 },
-  title: { fontSize: 28, fontWeight: "700", marginBottom: 8 },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 12,
-  },
-});
