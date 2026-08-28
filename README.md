@@ -1,8 +1,7 @@
 # ConnoSr
 
 ConnoSr é uma rede social de reviews de experiências (restaurantes, hotéis,
-resorts, parques etc.) — como um Letterboxd, mas para lugares em vez de
-filmes. Usuários escrevem reviews com nota e um carrossel de fotos, seguem
+resorts, parques etc.) — como um Letterboxd. Usuários escrevem reviews com nota e um carrossel de fotos, seguem
 outros usuários e acompanham tudo em um feed.
 
 ## Estrutura do monorepo
